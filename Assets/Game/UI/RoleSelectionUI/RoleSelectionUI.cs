@@ -15,7 +15,6 @@ namespace Game.UI.RoleSelectionUI
 
         private void Start()
         {
-            // Получаем локальный объект игрока через NetworkManager
             if (NetworkManager.Singleton != null && NetworkManager.Singleton.SpawnManager != null)
             {
                 NetworkObject localPlayerObject = NetworkManager.Singleton.SpawnManager.GetLocalPlayerObject();
