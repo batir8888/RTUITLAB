@@ -7,5 +7,6 @@ namespace Game.Riddles.AuthRiddle
         float CodeValidityTime { get; }
         string CurrentCode { get; }
         float SyncStartTime { get; }
+        void DeactivateRiddleServerRpc();
     }
 }
