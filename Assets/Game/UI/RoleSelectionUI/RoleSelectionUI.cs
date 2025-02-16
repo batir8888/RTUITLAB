@@ -36,7 +36,7 @@ namespace Game.UI.RoleSelectionUI
 
         private void OnRoleSelected(PlayerRole role)
         {
-            _localPlayerRoleManager = NetworkManager.Singleton.SpawnManager.GetLocalPlayerObject().GetComponent<PlayerRoleManager>();
+            _localPlayerRoleManager = NetworkManager.Singleton.LocalClient.PlayerObject.GetComponent<PlayerRoleManager>();
             
             if (_localPlayerRoleManager != null)
             {
@@ -50,14 +50,7 @@ namespace Game.UI.RoleSelectionUI
 
         private void OnResetRole()
         {
-            if (NetworkManager.Singleton != null && NetworkManager.Singleton.SpawnManager != null)
-            {
-                NetworkObject localPlayerObject = NetworkManager.Singleton.SpawnManager.GetLocalPlayerObject();
-                if (localPlayerObject != null)
-                {
-                    _localPlayerRoleManager = localPlayerObject.GetComponent<PlayerRoleManager>();
-                }
-            }
+            _localPlayerRoleManager = NetworkManager.Singleton.LocalClient.PlayerObject.GetComponent<PlayerRoleManager>();
             
             if (_localPlayerRoleManager != null && _localPlayerRoleManager.IsOwner)
             {

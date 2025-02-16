@@ -1,8 +1,9 @@
 using System;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
-public class ServiceLocator : MonoBehaviour
+public class ServiceLocator : NetworkBehaviour
 {
     public static ServiceLocator Instance { get; private set; }
     

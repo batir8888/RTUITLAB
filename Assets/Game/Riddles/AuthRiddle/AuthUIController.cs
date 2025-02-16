@@ -8,15 +8,15 @@ namespace Game.Riddles.AuthRiddle
     {
         [Header("UI компоненты")]
         public Text codeDisplay;
-
         public Text timerDisplay;
-        public Image progressBar;
-
+        
         private IAuthService _authService;
+        
+        [SerializeField] private AuthService authService;
 
         private void Start()
         {
-            _authService = ServiceLocator.Instance.GetService<IAuthService>();
+            _authService = authService != null ? authService : ServiceLocator.Instance.GetService<IAuthService>();
             StartCoroutine(UpdateUICoroutine());
         }
 
@@ -24,13 +24,9 @@ namespace Game.Riddles.AuthRiddle
         {
             while (true)
             {
-                if (_authService != null)
-                {
-                    codeDisplay.text = _authService.CurrentCode;
-                    var timeLeft = _authService.GetTimeLeft();
-                    timerDisplay.text = Mathf.Ceil(timeLeft).ToString();
-                    progressBar.fillAmount = timeLeft / _authService.CodeValidityTime;
-                }
+                codeDisplay.text = _authService.CurrentCode;
+                var timeLeft = _authService.GetTimeLeft();
+                timerDisplay.text = Mathf.Ceil(timeLeft).ToString();
                 yield return null;
             }
         }

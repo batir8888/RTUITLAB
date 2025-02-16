@@ -15,25 +15,14 @@ namespace Game.Teleporter.Scripts
 
         private readonly Dictionary<PlayerRole, ulong> _assignedRoles = new();
 
-        private void Awake()
-        {
-            ServiceLocator.Instance.RegisterService<ITeleportService>(this);
-        }
-
-        private void Start()
-        {
-            ServiceLocator.Instance.RegisterService<ITeleportService>(this);
-        }
-
         public override void OnNetworkSpawn()
         {
-            base.OnNetworkSpawn();
             ServiceLocator.Instance.RegisterService<ITeleportService>(this);
         }
 
-        public override void OnDestroy()
+        private void OnDisable()
         {
-            ServiceLocator.Instance.UnregisterService<ITeleportService>();
+            ServiceLocator.Instance.RegisterService<ITeleportService>(this);
         }
 
         public bool TryAssignRole(PlayerRole role, ulong clientId)

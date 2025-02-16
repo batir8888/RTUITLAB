@@ -15,8 +15,18 @@ namespace Game.Player
     public class PlayerRoleManager : NetworkBehaviour
     {
         public NetworkVariable<PlayerRole> playerRole = new();
+        
+        private ITeleportService _teleportService;
+        
+        [SerializeField] private TeleportService teleportService;
 
-        [ServerRpc(RequireOwnership = true)]
+        public override void OnNetworkSpawn()
+        {
+            teleportService = FindObjectOfType<TeleportService>();
+            _teleportService = teleportService != null ? teleportService : ServiceLocator.Instance.GetService<ITeleportService>();
+        }
+
+        [ServerRpc(RequireOwnership = false)]
         public void SetRoleServerRpc(PlayerRole newRole)
         {
             if (playerRole.Value != PlayerRole.None)
@@ -25,13 +35,13 @@ namespace Game.Player
                 return;
             }
 
-            bool success = ServiceLocator.Instance.GetService<ITeleportService>().TryAssignRole(newRole, OwnerClientId);
+            bool success = _teleportService.TryAssignRole(newRole, OwnerClientId);
             Debug.Log(success);
             if (success)
             {
                 playerRole.Value = newRole;
-                Vector3 destination = ServiceLocator.Instance.GetService<ITeleportService>().GetTeleportDestination(newRole);
-                GetComponent<XRINetworkPlayer>().m_XROrigin.transform.position = destination;
+                Vector3 destination = _teleportService.GetTeleportDestination(newRole);
+                TeleportClientRpc(destination);
                 Debug.Log($"Игрок {OwnerClientId} получил роль {newRole} и телепортирован в {destination}");
             }
             else
@@ -50,15 +60,26 @@ namespace Game.Player
             }
 
             PlayerRole oldRole = playerRole.Value;
-            bool success = ServiceLocator.Instance.GetService<ITeleportService>().ResetRole(oldRole, OwnerClientId);
+            bool success = !_teleportService.TryAssignRole(oldRole, OwnerClientId);
             if (success)
             {
+                teleportService.ResetRole(oldRole, OwnerClientId);
                 playerRole.Value = PlayerRole.None;
                 Debug.Log($"Игрок {OwnerClientId} сбросил свою роль {oldRole}");
             }
             else
             {
                 Debug.Log($"Не удалось сбросить роль {oldRole} для игрока {OwnerClientId}");
+            }
+        }
+        
+        [ClientRpc]
+        private void TeleportClientRpc(Vector3 destination)
+        {
+            XRINetworkPlayer xrPlayer = GetComponent<XRINetworkPlayer>();
+            if (xrPlayer != null)
+            {
+                xrPlayer.m_XROrigin.transform.position = destination;
             }
         }
     }
