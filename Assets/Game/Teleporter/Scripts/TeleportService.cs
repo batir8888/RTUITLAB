@@ -1,10 +1,12 @@
+using System;
 using System.Collections.Generic;
 using Game.Player;
+using Unity.Netcode;
 using UnityEngine;
 
 namespace Game.Teleporter.Scripts
 {
-    public class TeleportService : MonoBehaviour, ITeleportService
+    public class TeleportService : NetworkBehaviour, ITeleportService
     {
         [Header("Teleport Destinations")]
         [SerializeField] private Transform executorDestination;
@@ -18,7 +20,18 @@ namespace Game.Teleporter.Scripts
             ServiceLocator.Instance.RegisterService<ITeleportService>(this);
         }
 
-        private void OnDestroy()
+        private void Start()
+        {
+            ServiceLocator.Instance.RegisterService<ITeleportService>(this);
+        }
+
+        public override void OnNetworkSpawn()
+        {
+            base.OnNetworkSpawn();
+            ServiceLocator.Instance.RegisterService<ITeleportService>(this);
+        }
+
+        public override void OnDestroy()
         {
             ServiceLocator.Instance.UnregisterService<ITeleportService>();
         }

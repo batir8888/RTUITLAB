@@ -125,7 +125,7 @@ namespace XRMultiplayer
         /// <summary>
         /// Reference to the local player XR Origin
         /// </summary>
-        protected XROrigin m_XROrigin;
+        [field: SerializeField] public XROrigin m_XROrigin { get; protected set; }
 
         /// <summary>
         /// If the player has been connected to the the game.

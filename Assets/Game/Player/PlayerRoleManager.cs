@@ -1,6 +1,7 @@
 using Game.Teleporter.Scripts;
 using Unity.Netcode;
 using UnityEngine;
+using XRMultiplayer;
 
 namespace Game.Player
 {
@@ -13,9 +14,9 @@ namespace Game.Player
 
     public class PlayerRoleManager : NetworkBehaviour
     {
-        public NetworkVariable<PlayerRole> playerRole = new NetworkVariable<PlayerRole>(PlayerRole.None);
+        public NetworkVariable<PlayerRole> playerRole = new();
 
-        [ServerRpc(RequireOwnership = false)]
+        [ServerRpc(RequireOwnership = true)]
         public void SetRoleServerRpc(PlayerRole newRole)
         {
             if (playerRole.Value != PlayerRole.None)
@@ -30,7 +31,7 @@ namespace Game.Player
             {
                 playerRole.Value = newRole;
                 Vector3 destination = ServiceLocator.Instance.GetService<ITeleportService>().GetTeleportDestination(newRole);
-                transform.position = destination;
+                GetComponent<XRINetworkPlayer>().m_XROrigin.transform.position = destination;
                 Debug.Log($"Игрок {OwnerClientId} получил роль {newRole} и телепортирован в {destination}");
             }
             else
