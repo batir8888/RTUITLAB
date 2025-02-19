@@ -8,14 +8,16 @@ namespace Game.Riddles.AuthRiddle
     {
         [Header("Настройки аутентификации")]
         public bool isMaster;
-
-        public float CodeValidityTime { get; } = 10f;
+        
+        public string CurrentCode => _currentCode;
+        public float SyncStartTime => _syncStartTime;
+        public float CodeValidityTime => codeValidityTime;
 
         private string _currentCode;
         private float _syncStartTime;
 
-        public string CurrentCode => _currentCode;
-        public float SyncStartTime => _syncStartTime;
+        [SerializeField] private float codeValidityTime;
+        [SerializeField] private NetworkDoor door;
 
         private void Awake()
         {
@@ -24,6 +26,7 @@ namespace Game.Riddles.AuthRiddle
 
         public override void OnNetworkSpawn()
         {
+            ServiceLocator.Instance.RegisterService<IAuthService>(this);
             if (IsServer && isMaster)
             {
                 StartCoroutine(MasterAuthCoroutine());
@@ -59,6 +62,12 @@ namespace Game.Riddles.AuthRiddle
             _currentCode = code;
             _syncStartTime = syncTime;
             Debug.Log("Получен новый код через RPC: " + _currentCode + " со временем: " + _syncStartTime);
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        public void DeactivateRiddleServerRpc()
+        {
+            door.IsInteracted = true;
         }
 
         public float GetTimeLeft()
