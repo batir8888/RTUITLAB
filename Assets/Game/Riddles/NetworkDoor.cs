@@ -8,7 +8,20 @@ namespace Game.Riddles
     [RequireComponent(typeof(NetworkTransform))]
     public class NetworkDoor : NetworkBehaviour
     {
-        public bool IsInteracted { set => _isInteracted.Value = value; }
+        public bool IsInteracted 
+        {
+            set
+            {
+                if (IsServer)
+                {
+                    _isInteracted.Value = value;
+                }
+                else
+                {
+                    RequestInteractionServerRpc(value);
+                }
+            } 
+        }
 
         private readonly NetworkVariable<bool> _isInteracted = new();
 
@@ -30,18 +43,41 @@ namespace Game.Riddles
             }
         }
 
+        public override void OnNetworkDespawn()
+        {
+            if (IsServer)
+            {
+                _isInteracted.OnValueChanged -= OnInteractionChanged;
+            }
+            base.OnNetworkDespawn();
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        private void RequestInteractionServerRpc(bool interact)
+        {
+            _isInteracted.Value = interact;
+        }
+
         private void OnInteractionChanged(bool oldValue, bool newValue)
+        {
+            MoveDoorClientRpc(newValue);
+        }
+
+        [ClientRpc(RequireOwnership = false)]
+        private void MoveDoorClientRpc(bool newValue)
         {
             if (_moveCoroutine != null)
                 StopCoroutine(_moveCoroutine);
 
-            _moveCoroutine = StartCoroutine(MoveDoor(newValue ? _closedPosition : _openPosition,
-                newValue ? _openPosition : _closedPosition));
+            Vector3 from = newValue ? _closedPosition : _openPosition;
+            Vector3 to = newValue ? _openPosition : _closedPosition;
+
+            _moveCoroutine = StartCoroutine(MoveDoor(from, to));
         }
 
         private IEnumerator MoveDoor(Vector3 from, Vector3 to)
         {
-            float elapsed = 0f;
+            var elapsed = 0f;
             while (elapsed < moveTime)
             {
                 transform.position = Vector3.Lerp(from, to, elapsed / moveTime);

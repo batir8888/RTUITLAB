@@ -1,10 +1,11 @@
 using System.Collections;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace Game.Riddles.AuthRiddle
 {
-    public class AuthUIController : MonoBehaviour
+    public class AuthUIController : NetworkBehaviour
     {
         [Header("UI компоненты")]
         public Text codeDisplay;
@@ -14,8 +15,9 @@ namespace Game.Riddles.AuthRiddle
         
         [SerializeField] private AuthService authService;
 
-        private void Start()
+        public override void OnNetworkSpawn()
         {
+            authService = FindObjectOfType<AuthService>();
             _authService = authService != null ? authService : ServiceLocator.Instance.GetService<IAuthService>();
             StartCoroutine(UpdateUICoroutine());
         }

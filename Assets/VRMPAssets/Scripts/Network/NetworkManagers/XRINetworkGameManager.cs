@@ -49,7 +49,7 @@ namespace XRMultiplayer
         /// <summary>
         /// Max amount of players allowed when creating a new room.
         /// </summary>
-        public const int maxPlayers = 20;
+        public const int maxPlayers = 2;
 
         /// <summary>
         /// Singleton Reference for access to this manager.

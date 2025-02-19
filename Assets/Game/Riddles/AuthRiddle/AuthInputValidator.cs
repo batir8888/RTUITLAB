@@ -1,9 +1,10 @@
 using TMPro;
+using Unity.Netcode;
 using UnityEngine;
 
 namespace Game.Riddles.AuthRiddle
 {
-    public class AuthInputValidator : MonoBehaviour
+    public class AuthInputValidator : NetworkBehaviour
     {
         [Header("Поле ввода кода")]
         public TMP_InputField codeInput;
@@ -11,8 +12,9 @@ namespace Game.Riddles.AuthRiddle
         private IAuthService _authService;
         
         [SerializeField] private AuthService authService;
-        private void Start()
+        public override void OnNetworkSpawn()
         {
+            authService = FindObjectOfType<AuthService>();
             _authService = authService != null ? authService : ServiceLocator.Instance.GetService<IAuthService>();
         }
 
