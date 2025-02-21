@@ -27,7 +27,7 @@ public class ServiceLocator : NetworkBehaviour
 
     public T GetService<T>()
     {
-        if (_services.TryGetValue(typeof(T), out object service))
+        if (_services.TryGetValue(typeof(T), out var service))
         {
             return (T)service;
         }

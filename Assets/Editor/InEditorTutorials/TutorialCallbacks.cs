@@ -33,7 +33,7 @@ public class TutorialCallbacks : ScriptableObject
         assetPath = assetPath ?? $"{TutorialEditorUtils.GetActiveFolderPath()}/{DefaultFileName}.asset";
         var asset = CreateInstance<TutorialCallbacks>();
         AssetDatabase.CreateAsset(asset, AssetDatabase.GenerateUniqueAssetPath(assetPath));
-        EditorUtility.FocusProjectWindow(); // needed in order to make the selection of newly created asset to really work
+        EditorUtility.FocusProjectWindow();
         Selection.activeObject = asset;
         return asset;
     }

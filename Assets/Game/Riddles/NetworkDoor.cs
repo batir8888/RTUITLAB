@@ -69,8 +69,8 @@ namespace Game.Riddles
             if (_moveCoroutine != null)
                 StopCoroutine(_moveCoroutine);
 
-            Vector3 from = newValue ? _closedPosition : _openPosition;
-            Vector3 to = newValue ? _openPosition : _closedPosition;
+            var from = newValue ? _closedPosition : _openPosition;
+            var to = newValue ? _openPosition : _closedPosition;
 
             _moveCoroutine = StartCoroutine(MoveDoor(from, to));
         }

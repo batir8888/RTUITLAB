@@ -17,7 +17,7 @@ namespace Game.UI.RoleSelectionUI
         {
             if (NetworkManager.Singleton != null && NetworkManager.Singleton.SpawnManager != null)
             {
-                NetworkObject localPlayerObject = NetworkManager.Singleton.SpawnManager.GetLocalPlayerObject();
+                var localPlayerObject = NetworkManager.Singleton.SpawnManager.GetLocalPlayerObject();
                 if (localPlayerObject != null)
                 {
                     _localPlayerRoleManager = localPlayerObject.GetComponent<PlayerRoleManager>();

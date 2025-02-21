@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Game.Player;
 using Unity.Netcode;
@@ -37,7 +36,7 @@ namespace Game.Teleporter.Scripts
 
         public bool ResetRole(PlayerRole role, ulong clientId)
         {
-            if (_assignedRoles.TryGetValue(role, out ulong assignedClient))
+            if (_assignedRoles.TryGetValue(role, out var assignedClient))
             {
                 if (assignedClient == clientId)
                 {

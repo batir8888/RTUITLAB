@@ -1,5 +1,3 @@
-// #define AUTO_INCREMENT_BUILD
-
 using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
 

@@ -35,12 +35,12 @@ namespace Game.Player
                 return;
             }
 
-            bool success = _teleportService.TryAssignRole(newRole, OwnerClientId);
+            var success = _teleportService.TryAssignRole(newRole, OwnerClientId);
             Debug.Log(success);
             if (success)
             {
                 playerRole.Value = newRole;
-                Vector3 destination = _teleportService.GetTeleportDestination(newRole);
+                var destination = _teleportService.GetTeleportDestination(newRole);
                 TeleportClientRpc(destination);
                 Debug.Log($"Игрок {OwnerClientId} получил роль {newRole} и телепортирован в {destination}");
             }
@@ -59,8 +59,8 @@ namespace Game.Player
                 return;
             }
 
-            PlayerRole oldRole = playerRole.Value;
-            bool success = !_teleportService.TryAssignRole(oldRole, OwnerClientId);
+            var oldRole = playerRole.Value;
+            var success = !_teleportService.TryAssignRole(oldRole, OwnerClientId);
             if (success)
             {
                 teleportService.ResetRole(oldRole, OwnerClientId);
@@ -76,7 +76,7 @@ namespace Game.Player
         [ClientRpc]
         private void TeleportClientRpc(Vector3 destination)
         {
-            XRINetworkPlayer xrPlayer = GetComponent<XRINetworkPlayer>();
+            var xrPlayer = GetComponent<XRINetworkPlayer>();
             if (xrPlayer != null)
             {
                 xrPlayer.m_XROrigin.transform.position = destination;

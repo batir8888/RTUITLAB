@@ -11,13 +11,13 @@ public class TextConverter : MonoBehaviour
     static void UpdateLegacyText()
     {
         Debug.Log("Converting Legacy Text to TMP");
-        Text[] allText = FindObjectsByType<Text>(FindObjectsSortMode.None);
+        var allText = FindObjectsByType<Text>(FindObjectsSortMode.None);
         Debug.Log($"Found {allText.Length} Legacy Text{(allText.Length > 1 ? "s" : "")}");
-        List<TextMigrator> migratorList = new List<TextMigrator>();
+        var migratorList = new List<TextMigrator>();
         foreach (var t in allText)
         {
 
-            TextMigrator migrator = new TextMigrator()
+            var migrator = new TextMigrator()
             {
                 transform = t.transform,
                 textValue = t.text,
@@ -34,7 +34,7 @@ public class TextConverter : MonoBehaviour
             DestroyImmediate(t);
         }
 
-        StringBuilder sb = new StringBuilder();
+        var sb = new StringBuilder();
         foreach (var migrator in migratorList)
         {
             sb.AppendLine($" -Migrating {migrator.textValue} to TMP");
@@ -42,7 +42,7 @@ public class TextConverter : MonoBehaviour
             tmp.text = migrator.textValue;
             tmp.fontSize = migrator.textSize;
 
-            TMPAlignment alignment = GetAlignment(migrator.textAlignment);
+            var alignment = GetAlignment(migrator.textAlignment);
             tmp.verticalAlignment = alignment.verticalAlignment;
             tmp.horizontalAlignment = alignment.horizontalAlignment;
 
