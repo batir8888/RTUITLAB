@@ -13,6 +13,7 @@ namespace Game.Riddles.CellsRiddle
         [SerializeField] private BoolRow[] operatorPattern = new BoolRow[7];
 
         [SerializeField] private Transform cellsParent;
+        [SerializeField] private NetworkDoor door;
 
         private void OnValidate()
         {
@@ -72,7 +73,6 @@ namespace Game.Riddles.CellsRiddle
         
         public override void OnNetworkSpawn()
         {
-            if (!IsServer) return;
             for (var i = 0; i < 7; i++)
             {
                 for (var j = 0; j < 7; j++)
@@ -87,8 +87,6 @@ namespace Game.Riddles.CellsRiddle
         
         private void OnCellStateChanged(bool previousValue, bool newValue)
         {
-            if (!IsServer) return;
-
             if (CheckPattern())
             {
                 OpenDoor();
@@ -112,6 +110,8 @@ namespace Game.Riddles.CellsRiddle
                     {
                         allMatched = false;
                     }
+                    
+                    Debug.Log($"Cell [{i},{j}] - Executor: {cellActive}, Operator: {operatorPattern[i].row[j]}, Matched: {operatorPattern[i].matched[j]}");
                 }
             }
 
@@ -127,6 +127,7 @@ namespace Game.Riddles.CellsRiddle
         [ClientRpc]
         private void OpenDoorClientRpc()
         {
+            door.IsInteracted = true;
             Debug.Log("Дверь открыта на клиенте!");
         }
     }
