@@ -1,6 +1,7 @@
 using System;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Game.Riddles.CellsRiddle
 {
@@ -12,9 +13,17 @@ namespace Game.Riddles.CellsRiddle
         [Header("Операторский узор (Reference Pattern)")]
         [SerializeField] private BoolRow[] operatorPattern = new BoolRow[7];
 
+        [Header("Родитель для ячеек исполнителя")]
         [SerializeField] private Transform cellsParent;
+        
+        [Header("Дверь")]
         [SerializeField] private NetworkDoor door;
 
+        [Header("Родитель для отображения оператора (монитор)")]
+        [SerializeField] private Transform operatorCellsParent;
+
+        private Image[,] _operatorImages = new Image[7, 7];
+        
         private void OnValidate()
         {
             if (executorGrid.Length != 7) executorGrid = new GridCellRow[7];
@@ -69,10 +78,51 @@ namespace Game.Riddles.CellsRiddle
                     executorGrid[rowIndex].row[cellIndex] = cell;
                 }
             }
+
+            if (operatorCellsParent == null)
+            {
+                Debug.LogWarning("operatorCellsParent не назначен в инспекторе!", this);
+                return;
+            }
+
+            if (operatorCellsParent.childCount < 7)
+            {
+                Debug.LogWarning($"Ожидается минимум 7 строк (Row) в operatorCellsParent, а найдено {operatorCellsParent.childCount}", this);
+                return;
+            }
+
+            for (var i = 0; i < 7; i++)
+            {
+                var rowTransform = operatorCellsParent.GetChild(i);
+                if (rowTransform.childCount < 7)
+                {
+                    Debug.LogWarning($"В объекте {rowTransform.name} недостаточно дочерних объектов (Circle). Найдено {rowTransform.childCount}", rowTransform);
+                    continue;
+                }
+
+                for (var j = 0; j < 7; j++)
+                {
+                    var circleTransform = rowTransform.GetChild(j);
+                    var circleImage = circleTransform.GetComponent<Image>();
+                    if (circleImage == null)
+                    {
+                        Debug.LogWarning($"В {circleTransform.name} нет компонента Image!", circleTransform);
+                        continue;
+                    }
+
+                    _operatorImages[i, j] = circleImage;
+                }
+            }
         }
         
         public override void OnNetworkSpawn()
         {
+            if (IsServer)
+            {
+                GenerateRandomOperatorPattern();
+                UpdateOperatorMonitorClientRpc(OperatorPatternToByteArray());
+            }
+            
             for (var i = 0; i < 7; i++)
             {
                 for (var j = 0; j < 7; j++)
@@ -129,6 +179,103 @@ namespace Game.Riddles.CellsRiddle
         {
             door.IsInteracted = true;
             Debug.Log("Дверь открыта на клиенте!");
+        }
+        
+        private void GenerateRandomOperatorPattern()
+        {
+            for (var i = 0; i < operatorPattern.Length; i++)
+            {
+                operatorPattern[i] ??= new BoolRow
+                {
+                    row = new bool[7],
+                    matched = new bool[7]
+                };
+                for (var j = 0; j < operatorPattern[i].row.Length; j++)
+                {
+                    operatorPattern[i].row[j] = UnityEngine.Random.value > 0.5f;
+                }
+            }
+            
+            Debug.Log("Сгенерирован случайный операционный узор на сервере.");
+        }
+
+        private void UpdateOperatorMonitor()
+        {
+            if (operatorCellsParent == null) return;
+            
+            for (var i = 0; i < 7; i++)
+            {
+                for (var j = 0; j < 7; j++)
+                {
+                    if (_operatorImages != null && _operatorImages[i, j] == null) continue;
+
+                    if (_operatorImages != null)
+                        _operatorImages[i, j].color = operatorPattern[i].row[j] ? Color.red : Color.white;
+                }
+            }
+        }
+
+        [ClientRpc]
+        private void UpdateOperatorMonitorClientRpc(byte[] patternData)
+        {
+            var bools = ByteArrayToBoolArray(patternData);
+            var index = 0;
+            for (var i = 0; i < 7; i++)
+            {
+                for (var j = 0; j < 7; j++)
+                {
+                    operatorPattern[i].row[j] = bools[index];
+                    index++;
+                }
+            }
+
+            UpdateOperatorMonitor();
+        }
+
+        private byte[] OperatorPatternToByteArray()
+        {
+            var bools = new bool[7 * 7];
+            var index = 0;
+            for (var i = 0; i < 7; i++)
+            {
+                for (var j = 0; j < 7; j++)
+                {
+                    bools[index] = operatorPattern[i].row[j];
+                    index++;
+                }
+            }
+
+            return BoolArrayToByteArray(bools);
+        }
+
+        private byte[] BoolArrayToByteArray(bool[] boolArray)
+        {
+            var byteLength = (boolArray.Length + 7) / 8;
+            var bytes = new byte[byteLength];
+
+            var bitIndex = 0;
+            for (var i = 0; i < boolArray.Length; i++)
+            {
+                if (boolArray[i])
+                {
+                    bytes[bitIndex / 8] |= (byte)(1 << (bitIndex % 8));
+                }
+                bitIndex++;
+            }
+
+            return bytes;
+        }
+
+        private bool[] ByteArrayToBoolArray(byte[] bytes)
+        {
+            var boolArray = new bool[7 * 7];
+            var bitIndex = 0;
+            for (var i = 0; i < boolArray.Length; i++)
+            {
+                boolArray[i] = (bytes[bitIndex / 8] & (1 << (bitIndex % 8))) != 0;
+                bitIndex++;
+            }
+            return boolArray;
         }
     }
 
