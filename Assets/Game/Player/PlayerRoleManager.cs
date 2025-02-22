@@ -25,6 +25,15 @@ namespace Game.Player
             teleportService = FindObjectOfType<TeleportService>();
             _teleportService = teleportService != null ? teleportService : ServiceLocator.Instance.GetService<ITeleportService>();
         }
+        
+        public override void OnNetworkDespawn()
+        {
+            ResetRoleServerRpc();
+            var destination = _teleportService.GetTeleportDestination(PlayerRole.None);
+            TeleportClientRpc(destination);
+            teleportService = null;
+            _teleportService = null;
+        }
 
         [ServerRpc(RequireOwnership = false)]
         public void SetRoleServerRpc(PlayerRole newRole)

@@ -49,15 +49,12 @@ namespace Game.Teleporter.Scripts
 
         public Vector3 GetTeleportDestination(PlayerRole role)
         {
-            switch (role)
+            return role switch
             {
-                case PlayerRole.Executor:
-                    return executorDestination.position;
-                case PlayerRole.Operator:
-                    return operatorDestination.position;
-                default:
-                    return defaultDestination != null ? defaultDestination.position : Vector3.zero;
-            }
+                PlayerRole.Executor => executorDestination.position,
+                PlayerRole.Operator => operatorDestination.position,
+                _ => defaultDestination != null ? defaultDestination.position : Vector3.zero
+            };
         }
     }
 }
