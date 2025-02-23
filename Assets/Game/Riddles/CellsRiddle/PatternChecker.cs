@@ -21,10 +21,11 @@ namespace Game.Riddles.CellsRiddle
 
         [Header("Родитель для отображения оператора (монитор)")]
         [SerializeField] private Transform operatorCellsParent;
-
+        [SerializeField, Range(0.1f, 0.9f)] private float chanceToCell;
+        
         private Image[,] _operatorImages = new Image[7, 7];
         
-        private void OnValidate()
+        private void Awake()
         {
             if (executorGrid.Length != 7) executorGrid = new GridCellRow[7];
             if (operatorPattern.Length != 7) operatorPattern = new BoolRow[7];
@@ -117,11 +118,8 @@ namespace Game.Riddles.CellsRiddle
         
         public override void OnNetworkSpawn()
         {
-            if (IsServer)
-            {
-                GenerateRandomOperatorPattern();
-                UpdateOperatorMonitorClientRpc(OperatorPatternToByteArray());
-            }
+            GenerateRandomOperatorPattern();
+            UpdateOperatorMonitorClientRpc(OperatorPatternToByteArray());
             
             for (var i = 0; i < 7; i++)
             {
@@ -161,7 +159,7 @@ namespace Game.Riddles.CellsRiddle
                         allMatched = false;
                     }
                     
-                    Debug.Log($"Cell [{i},{j}] - Executor: {cellActive}, Operator: {operatorPattern[i].row[j]}, Matched: {operatorPattern[i].matched[j]}");
+                    //Debug.Log($"Cell [{i},{j}] - Executor: {cellActive}, Operator: {operatorPattern[i].row[j]}, Matched: {operatorPattern[i].matched[j]}");
                 }
             }
 
@@ -192,7 +190,7 @@ namespace Game.Riddles.CellsRiddle
                 };
                 for (var j = 0; j < operatorPattern[i].row.Length; j++)
                 {
-                    operatorPattern[i].row[j] = UnityEngine.Random.value > 0.5f;
+                    operatorPattern[i].row[j] = UnityEngine.Random.value < chanceToCell;
                 }
             }
             
