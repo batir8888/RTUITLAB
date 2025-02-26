@@ -118,8 +118,12 @@ namespace Game.Riddles.CellsRiddle
         
         public override void OnNetworkSpawn()
         {
-            GenerateRandomOperatorPattern();
-            UpdateOperatorMonitorClientRpc(OperatorPatternToByteArray());
+            if (IsServer)
+            {
+                GenerateRandomOperatorPatternServerRpc();
+            }
+            
+            NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
             
             for (var i = 0; i < 7; i++)
             {
@@ -132,7 +136,22 @@ namespace Game.Riddles.CellsRiddle
                 }
             }
         }
-        
+
+        public override void OnNetworkDespawn()
+        {
+            NetworkManager.Singleton.OnClientConnectedCallback -= OnClientConnected;
+            for (var i = 0; i < 7; i++)
+            {
+                for (var j = 0; j < 7; j++)
+                {
+                    var cell = executorGrid[i].row[j];
+                    if (cell == null) continue;
+
+                    cell.isActive.OnValueChanged -= OnCellStateChanged;
+                }
+            }
+        }
+
         private void OnCellStateChanged(bool previousValue, bool newValue)
         {
             if (CheckPattern())
@@ -158,8 +177,6 @@ namespace Game.Riddles.CellsRiddle
                     {
                         allMatched = false;
                     }
-                    
-                    //Debug.Log($"Cell [{i},{j}] - Executor: {cellActive}, Operator: {operatorPattern[i].row[j]}, Matched: {operatorPattern[i].matched[j]}");
                 }
             }
 
@@ -169,17 +186,18 @@ namespace Game.Riddles.CellsRiddle
         private void OpenDoor()
         {
             Debug.Log("Дверь открыта!");
-            OpenDoorClientRpc();
+            DeactivateRiddleServerRpc();
         }
 
-        [ClientRpc]
-        private void OpenDoorClientRpc()
+        [ServerRpc(RequireOwnership = false)]
+        private void DeactivateRiddleServerRpc()
         {
             door.IsInteracted = true;
             Debug.Log("Дверь открыта на клиенте!");
         }
         
-        private void GenerateRandomOperatorPattern()
+        [ServerRpc]
+        private void GenerateRandomOperatorPatternServerRpc()
         {
             for (var i = 0; i < operatorPattern.Length; i++)
             {
@@ -193,8 +211,9 @@ namespace Game.Riddles.CellsRiddle
                     operatorPattern[i].row[j] = UnityEngine.Random.value < chanceToCell;
                 }
             }
-            
             Debug.Log("Сгенерирован случайный операционный узор на сервере.");
+            
+            UpdateOperatorMonitorClientRpc(OperatorPatternToByteArray());
         }
 
         private void UpdateOperatorMonitor()
@@ -228,6 +247,14 @@ namespace Game.Riddles.CellsRiddle
             }
 
             UpdateOperatorMonitor();
+        }
+        
+        private void OnClientConnected(ulong clientId)
+        {
+            if (IsServer)
+            {
+                UpdateOperatorMonitorClientRpc(OperatorPatternToByteArray());
+            }
         }
 
         private byte[] OperatorPatternToByteArray()

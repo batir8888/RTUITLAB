@@ -6,8 +6,7 @@ namespace Game.Riddles.CellsRiddle
     [RequireComponent(typeof(CellInteractable)), RequireComponent(typeof(NetworkObject))]
     public class GridCell : NetworkBehaviour
     {
-        public NetworkVariable<bool> isActive = new(false,
-            NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+        public NetworkVariable<bool> isActive = new();
         
         private MeshRenderer _meshRenderer;
         
