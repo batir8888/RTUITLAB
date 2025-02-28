@@ -9,7 +9,8 @@ namespace Game.Player
     {
         None,
         Executor,
-        Operator
+        Operator,
+        Final
     }
 
     public class PlayerRoleManager : NetworkBehaviour
@@ -24,6 +25,10 @@ namespace Game.Player
         {
             teleportService = FindObjectOfType<TeleportService>();
             _teleportService = teleportService != null ? teleportService : ServiceLocator.Instance.GetService<ITeleportService>();
+            var finalDestination = _teleportService.GetTeleportDestination(PlayerRole.Final);
+            var encryptionManager = FindObjectOfType<EncryptionManager>();
+            if (encryptionManager != null) encryptionManager.CorrectWord += () => TeleportClientRpc(finalDestination);
+            else ServiceLocator.Instance.GetService<EncryptionManager>().CorrectWord += () => TeleportClientRpc(finalDestination);
         }
         
         public override void OnNetworkDespawn()

@@ -11,6 +11,7 @@ namespace Game.Teleporter.Scripts
         [SerializeField] private Transform executorDestination;
         [SerializeField] private Transform operatorDestination;
         [SerializeField] private Transform defaultDestination;
+        [SerializeField] private Transform finalDestination;
 
         private readonly Dictionary<PlayerRole, ulong> _assignedRoles = new();
 
@@ -53,6 +54,7 @@ namespace Game.Teleporter.Scripts
             {
                 PlayerRole.Executor => executorDestination.position,
                 PlayerRole.Operator => operatorDestination.position,
+                PlayerRole.Final => finalDestination.position,
                 _ => defaultDestination != null ? defaultDestination.position : Vector3.zero
             };
         }

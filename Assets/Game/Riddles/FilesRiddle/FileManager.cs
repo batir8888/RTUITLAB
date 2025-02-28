@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace Game.Riddles.FilesRiddle
 {
@@ -36,7 +37,7 @@ namespace Game.Riddles.FilesRiddle
             var infectedIndices = new HashSet<int>();
             while (infectedIndices.Count < maliciousCount)
             {
-                infectedIndices.Add(UnityEngine.Random.Range(0, count));
+                infectedIndices.Add(Random.Range(0, count));
             }
 
             for (var i = 0; i < count; i++)
@@ -44,8 +45,8 @@ namespace Game.Riddles.FilesRiddle
                 var entry = new FileInfoEntry
                 {
                     fileName = new FixedString32Bytes(i < 10 ? $"File_0{i}" : $"File_{i}"),
-                    fileSize = UnityEngine.Random.Range(1000, 10000),
-                    creationDate = new FixedString32Bytes(DateTime.Now.AddMinutes(-UnityEngine.Random.Range(0, 60)).ToString("HH:mm")),
+                    fileSize = Random.Range(1000, 10000),
+                    creationDate = new FixedString32Bytes(DateTime.Now.AddMinutes(-Random.Range(0, 60)).ToString("HH:mm")),
                     isMalicious = infectedIndices.Contains(i)
                 };
                 FileList.Add(entry);
@@ -57,7 +58,7 @@ namespace Game.Riddles.FilesRiddle
             var infectedIndices = new HashSet<int>();
             while (infectedIndices.Count < maliciousCount)
             {
-                infectedIndices.Add(UnityEngine.Random.Range(0, count));
+                infectedIndices.Add(Random.Range(0, count));
             }
 
             var currentCount = FileList.Count;
@@ -66,8 +67,8 @@ namespace Game.Riddles.FilesRiddle
                 var entry = new FileInfoEntry
                 {
                     fileName = new FixedString32Bytes($"Penalty_File_{currentCount + i}"),
-                    fileSize = UnityEngine.Random.Range(1000, 10000),
-                    creationDate = new FixedString32Bytes(DateTime.Now.AddMinutes(-UnityEngine.Random.Range(0, 60)).ToString("HH:mm")),
+                    fileSize = Random.Range(1000, 10000),
+                    creationDate = new FixedString32Bytes(DateTime.Now.AddMinutes(-Random.Range(0, 60)).ToString("HH:mm")),
                     isMalicious = infectedIndices.Contains(i)
                 };
                 FileList.Add(entry);

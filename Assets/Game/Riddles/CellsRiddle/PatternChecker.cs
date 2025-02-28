@@ -2,6 +2,7 @@ using System;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
+using Random = UnityEngine.Random;
 
 namespace Game.Riddles.CellsRiddle
 {
@@ -208,7 +209,7 @@ namespace Game.Riddles.CellsRiddle
                 };
                 for (var j = 0; j < operatorPattern[i].row.Length; j++)
                 {
-                    operatorPattern[i].row[j] = UnityEngine.Random.value < chanceToCell;
+                    operatorPattern[i].row[j] = Random.value < chanceToCell;
                 }
             }
             Debug.Log("Сгенерирован случайный операционный узор на сервере.");
