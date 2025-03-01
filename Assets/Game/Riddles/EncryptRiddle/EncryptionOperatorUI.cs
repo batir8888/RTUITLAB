@@ -1,4 +1,3 @@
-using System;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
@@ -13,6 +12,11 @@ namespace Game.Riddles.EncryptRiddle
         {
             var enteredText = inputField.text.Trim();
             SubmitEncryptedWordServerRpc(enteredText);
+        }
+
+        public override void OnNetworkSpawn()
+        {
+            inputField.text = "";
         }
 
         [ServerRpc]
