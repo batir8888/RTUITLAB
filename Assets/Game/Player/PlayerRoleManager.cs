@@ -1,7 +1,6 @@
 using Game.Teleporter.Scripts;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using XRMultiplayer;
 
 namespace Game.Player
