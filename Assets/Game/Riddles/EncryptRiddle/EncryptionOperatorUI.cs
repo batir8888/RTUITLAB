@@ -19,7 +19,7 @@ namespace Game.Riddles.EncryptRiddle
             inputField.text = "";
         }
 
-        [ServerRpc]
+        [ServerRpc(RequireOwnership = true)]
         private void SubmitEncryptedWordServerRpc(string enteredText)
         {
             var encryptionManager = ServiceLocator.Instance.GetService<EncryptionManager>();

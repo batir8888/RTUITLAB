@@ -1140,6 +1140,11 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: -30
       objectReference: {fileID: 0}
+    - target: {fileID: 5847216892010707487, guid: 55cf84fee11c98c4482a21dd9b3aeb29,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5953048225114478525, guid: 55cf84fee11c98c4482a21dd9b3aeb29,
         type: 3}
       propertyPath: m_AnchorMax.y
@@ -2610,10 +2615,10 @@ AudioSource:
   SpatializePostEffects: 0
   Priority: 128
   DopplerLevel: 1
-  MinDistance: 5
-  MaxDistance: 20.2
+  MinDistance: 1
+  MaxDistance: 4
   Pan2D: 0
-  rolloffMode: 0
+  rolloffMode: 1
   BypassEffects: 0
   BypassListenerEffects: 0
   BypassReverbZones: 0
