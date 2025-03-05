@@ -47,6 +47,7 @@
 
 ![Комната для диско (Финал)](screen4.png)
 
-### Видео
+### Ссылки
+Билд - https://disk.yandex.ru/d/2krYyu8ZBOKDhw
 
-Ссылка - https://vkvideo.ru/video329384717_456247931
+Видео - https://vkvideo.ru/video329384717_456247931
